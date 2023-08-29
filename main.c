@@ -69,6 +69,7 @@ void main()
             player.deathTimer--;
             if (player.deathTimer == 0)
             {
+                set_sprite_tile(player.gameObject.firstSprite, 0);
                 uint8_t subLives[] = {0, 1};
                 subBCD(lives, subLives, 2);
                 player.invincibilityTimer = invincibilityFrames;
@@ -174,9 +175,13 @@ void main()
                 else //the player is invincible
                 {
                     set_sprite_prop(player.gameObject.firstSprite, (player.invincibilityTimer >> 2) & 1 ? get_sprite_prop(player.gameObject.firstSprite) | S_PRIORITY : get_sprite_prop(player.gameObject.firstSprite) & ~S_PRIORITY); //used for blinking the player if invincible
-                    player.invincibilityTimer--;
                 }
             }
+        }
+
+        if (player.invincibilityTimer != 0)
+        {
+            player.invincibilityTimer--;
         }
 
         enemyUpdate++;
