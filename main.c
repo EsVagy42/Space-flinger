@@ -36,18 +36,6 @@ uint8_t SpaceshipPoints[] =
     0
 };
 
-typedef struct
-{
-    GameObject gameObject;
-    uint8_t accelerationShifts;
-    uint8_t dragShifts;
-    uint8_t deathTimer; //if it is set to something other than 0, the death animation is playing
-    enum SpaceshipType type;
-    uint8_t points;
-    void* move;
-} Enemy;
-
-
 void getInput(uint8_t input, fixed16* x, fixed16* y)
 {
     *x = FIXED(0);
@@ -128,6 +116,19 @@ typedef struct
     BOOLEAN attached;
 } Flinger;
 
+typedef struct Enemy Enemy;
+
+typedef struct Enemy
+{
+    GameObject gameObject;
+    uint8_t accelerationShifts;
+    uint8_t dragShifts;
+    uint8_t deathTimer; //if it is set to something other than 0, the death animation is playing
+    enum SpaceshipType type;
+    uint8_t points;
+    void (*move) (Enemy*, Player*); //this is a pointer to a function that makes the enemy move
+};
+
 Enemy enemies[maxEnemyNumber]; //the enemies are stored in this
 BOOLEAN activeEnemies[maxEnemyNumber]; //if the enemy in enemies at index is active or an open space for an enemy that needs to be loaded
 uint8_t enemyUpdate = 0; //used for checking if an enemy needs to be updated in the current frame. Enemies are updated every 4th frame to save on cpu usage
@@ -144,6 +145,17 @@ inline int8_t loadEnemy()
         }
     }
     return -1;
+}
+
+void moveFollower(Enemy* follower, Player* player)
+{
+    fixed16 x = sub(player->gameObject.posx, follower->gameObject.posx);
+    fixed16 y = sub(player->gameObject.posy, follower->gameObject.posy);
+    x = x >> follower->accelerationShifts;
+    y = y >> follower->accelerationShifts;
+    accelerateGameObject(&follower->gameObject, x, y);
+    applyDragToGameObject(&follower->gameObject, follower->dragShifts);
+    setRotatedSprite(follower->gameObject.firstSprite, 4, x, y);
 }
 
 void main()
@@ -295,14 +307,7 @@ void main()
                     {
                         if (i == enemyUpdate || i == enemyUpdate + (maxEnemyNumber >> 1)) //the enemy should be updated in the current frame
                         {
-                            //TODO: this should be replaced by enemy.move
-                            x = sub(player.gameObject.posx, enemies[i].gameObject.posx);
-                            y = sub(player.gameObject.posy, enemies[i].gameObject.posy);
-                            x = x >> enemies[i].accelerationShifts;
-                            y = y >> enemies[i].accelerationShifts;
-                            accelerateGameObject(&enemies[i].gameObject, x, y);
-                            applyDragToGameObject(&enemies[i].gameObject, enemies[i].dragShifts);
-                            setRotatedSprite(2 + i, 4, x, y);
+                            enemies[i].move(&enemies[i], &player);
                         }
                         updateGameObject(&enemies[i].gameObject, &player.gameObject);
                     }
@@ -380,6 +385,7 @@ void main()
                 enemies[index].gameObject.collider.sizey = FIXED(8);
                 enemies[index].type = follower;
                 enemies[index].deathTimer = 0;
+                enemies[index].move = moveFollower;
 
                 enemyTimer = resetEnemyTimer;
             }
