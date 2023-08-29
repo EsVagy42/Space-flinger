@@ -7,7 +7,8 @@
                 "C:/gbdk-win64/gbdk/**",
                 "C:/gbdk-win64/gbdk/include",
                 "${workspaceFolder}/Assets",
-                "${workspaceFolder}"
+                "${workspaceFolder}",
+                "${workspaceFolder}/.vscode"
             ],
             "defines": [
                 "_DEBUG",

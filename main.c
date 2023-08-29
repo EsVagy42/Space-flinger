@@ -1,146 +1,13 @@
 #include <gb/gb.h>
-#include "GameObject.c" //handles game objects
-#include "Constants.c"
+#include "Additionalfunctions.c"
 #include "Assets/Spaceships.c"  //sprite tiles
 #include "Assets/Space.c" //background tiles
 #include "Assets/SpaceMap.c" //background map
 
-enum SpaceshipType
-{
-    follower
-};
-
-//how many points should a given spaceship earn
-uint8_t SpaceshipPoints[] =
-{
-    0
-};
-
-void getInput(uint8_t input, fixed16* x, fixed16* y)
-{
-    *x = FIXED(0);
-    *y = FIXED(0);
-
-    if (input & J_UP)
-    {
-        *y = -inputSpeed;
-    }
-    if (input & J_DOWN)
-    {
-        *y = inputSpeed;
-    }
-    if (input & J_LEFT)
-    {
-        *x = -inputSpeed;
-    }
-    if (input & J_RIGHT)
-    {
-        *x = inputSpeed;
-    }
-
-    if (*x != 0 && *y != 0)
-    {
-        *x = *x > 0 ? inputSpeedDiagonal : -inputSpeedDiagonal;
-        *y = *y > 0 ? inputSpeedDiagonal : -inputSpeedDiagonal;
-    }
-}
-
-inline void showScore(uint8_t score[])
-{
-    for (uint8_t i = 0; i < 6; i++)
-    {
-        set_win_tile_xy(i + 1, 0, score[i] + numbersOffset);
-    }
-}
-
-inline void showLives(uint8_t lives[])
-{
-    set_win_tile_xy(18, 0, numbersOffset - 1);
-    for (uint8_t i = 0; i < 2; i++)
-    {
-        set_win_tile_xy(i + 19, 0, lives[i] + numbersOffset);
-    }
-}
-
-inline void addScore(uint8_t score[], uint8_t num)
-{
-    uint8_t lookup[7][8] = {
-        {0, 0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 2, 5},
-        {0, 0, 0, 0, 5, 0},
-        {0, 0, 0, 1, 0, 0},
-        {0, 0, 0, 2, 5 ,0},
-        {0 ,0 ,0 ,5 ,0 ,0},
-        {0 ,0 ,1 ,0 ,0 ,0}
-    };
-
-    uint8_t *addScore = lookup[num];
-
-    addBCD(score, addScore, 6);
-}
-
-typedef struct
-{
-    GameObject gameObject;
-    uint8_t accelerationShifts;
-    uint8_t dragShifts;
-    uint8_t deathTimer; //if it is set to something other than 0, the death animation is playing
-    uint8_t invincibilityTimer; //if it is set to something other than 0, the player is invincible
-} Player;
-
-typedef struct
-{
-    GameObject gameObject;
-    uint8_t accelerationShifts;
-    uint8_t dragShifts;
-    BOOLEAN attached;
-} Flinger;
-
-typedef struct Enemy Enemy;
-
-typedef struct Enemy
-{
-    GameObject gameObject;
-    uint8_t accelerationShifts;
-    uint8_t dragShifts;
-    uint8_t deathTimer; //if it is set to something other than 0, the death animation is playing
-    enum SpaceshipType type;
-    uint8_t points;
-    void (*move) (Enemy*, Player*); //this is a pointer to a function that makes the enemy move
-};
-
-Enemy enemies[maxEnemyNumber]; //the enemies are stored in this
-BOOLEAN activeEnemies[maxEnemyNumber]; //if the enemy in enemies at index is active or an open space for an enemy that needs to be loaded
 uint8_t enemyUpdate = 0; //used for checking if an enemy needs to be updated in the current frame. Enemies are updated every 4th frame to save on cpu usage
-
-//for loading enemies. it allocates the space for an enemy at the returned index in enemies or returns -1 if the allocation was unsuccessful
-inline int8_t loadEnemy()
-{
-    for (uint8_t i = 0; i < maxEnemyNumber; i++)
-    {
-        if (!activeEnemies[i])
-        {
-            activeEnemies[i] = TRUE;
-            return i;
-        }
-    }
-    return -1;
-}
-
-void moveFollower(Enemy* follower, Player* player)
-{
-    fixed16 x = sub(player->gameObject.posx, follower->gameObject.posx);
-    fixed16 y = sub(player->gameObject.posy, follower->gameObject.posy);
-    x = x >> follower->accelerationShifts;
-    y = y >> follower->accelerationShifts;
-    accelerateGameObject(&follower->gameObject, x, y);
-    applyDragToGameObject(&follower->gameObject, follower->dragShifts);
-    setRotatedSprite(follower->gameObject.firstSprite, 4, x, y);
-}
 
 void main()
 {
-
     SHOW_SPRITES;
     SHOW_BKG;
     SHOW_WIN;
@@ -168,39 +35,13 @@ void main()
 
     //initializing the player
     Player player;
-    player.gameObject.posx = FIXED(0);
-    player.gameObject.posy = FIXED(0);
-    player.gameObject.velx = FIXED(0);
-    player.gameObject.vely = FIXED(0);
-    player.gameObject.firstSprite = 0;
-    player.gameObject.spriteSizex = 1;
-    player.gameObject.spriteSizey = 1;
-    player.accelerationShifts = 0;
-    player.dragShifts = 5;
-    player.gameObject.collider.posx = add(player.gameObject.posx, FIXED(2));
-    player.gameObject.collider.posy = add(player.gameObject.posy, FIXED(2));
-    player.gameObject.collider.sizex = FIXED(4);
-    player.gameObject.collider.sizey = FIXED(4);
-    player.deathTimer = 0;
-    player.invincibilityTimer = invincibilityFrames;
+    initPlayer(&player);
 
     //initializing the flinger
     Flinger flinger;
-    flinger.gameObject.posx = FIXED(0);
-    flinger.gameObject.posy = FIXED(0);
-    flinger.gameObject.velx = FIXED(0);
-    flinger.gameObject.vely = FIXED(0);
-    flinger.gameObject.firstSprite = 1;
-    flinger.gameObject.spriteSizex = 1;
-    flinger.gameObject.spriteSizey = 1;
-    flinger.accelerationShifts = 6;
-    flinger.dragShifts = attachedFlingerDragShifts;
-    flinger.gameObject.collider.posx = flinger.gameObject.posx;
-    flinger.gameObject.collider.posy = flinger.gameObject.posy;
-    flinger.gameObject.collider.sizex = FIXED(8);
-    flinger.gameObject.collider.sizey = FIXED(8);
-    flinger.attached = TRUE;
+    initFlinger(&flinger);
 
+    //game loop
     while(1)
     {
         fixed16 x;
@@ -208,7 +49,7 @@ void main()
         if (player.deathTimer == 0) //that means the player is alive
         {
             uint8_t input = joypad();
-            if (input & J_A)
+            if (input & J_A) //A is pressed
             {
                 flinger.attached = FALSE;
                 flinger.dragShifts = detachedFlingerDragShifts;
@@ -226,7 +67,7 @@ void main()
                 applyDragToGameObject(&player.gameObject, player.dragShifts);
             }
             player.deathTimer--;
-            if (!player.deathTimer)
+            if (player.deathTimer == 0)
             {
                 uint8_t subLives[] = {0, 1};
                 subBCD(lives, subLives, 2);
@@ -349,23 +190,7 @@ void main()
             int8_t index = loadEnemy();
             if (index != -1)
             {
-                //TODO: this should be replaced by something
-                enemies[index].accelerationShifts = 11;
-                enemies[index].dragShifts = 4;
-                enemies[index].gameObject.firstSprite = 2 + index;
-                enemies[index].gameObject.spriteSizex = 1;
-                enemies[index].gameObject.spriteSizey = 1;
-                enemies[index].gameObject.posx = player.gameObject.posx;
-                enemies[index].gameObject.posy = sub(player.gameObject.posy, FIXED(80));
-                enemies[index].gameObject.velx = FIXED(0);
-                enemies[index].gameObject.vely = FIXED(0);
-                enemies[index].gameObject.collider.posx = enemies[index].gameObject.posx;
-                enemies[index].gameObject.collider.posy = enemies[index].gameObject.posy;
-                enemies[index].gameObject.collider.sizex = FIXED(8);
-                enemies[index].gameObject.collider.sizey = FIXED(8);
-                enemies[index].type = follower;
-                enemies[index].deathTimer = 0;
-                enemies[index].move = moveFollower;
+                initFollower(index, &player);
 
                 enemyTimer = resetEnemyTimer;
             }
