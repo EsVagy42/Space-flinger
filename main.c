@@ -1,5 +1,5 @@
 #include <gb/gb.h>
-#include "Additionalfunctions.c"
+#include "Enemies.c"
 #include "Assets/Spaceships.c"  //sprite tiles
 #include "Assets/Space.c" //background tiles
 #include "Assets/SpaceMap.c" //background map
@@ -131,6 +131,7 @@ void main()
                         if (i == enemyUpdate || i == enemyUpdate + (maxEnemyNumber >> 1)) //the enemy should be updated in the current frame
                         {
                             currentEnemy->move(currentEnemy, &player);
+                            currentEnemy->updateSprites(currentEnemy);
                         }
                         updateGameObject(&currentEnemy->gameObject, &player.gameObject);
                     }

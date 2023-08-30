@@ -1,5 +1,6 @@
 #include <gb/gb.h>
 #include "Player.c"
+#include "Additionalfunctions.c"
 
 enum SpaceshipType
 {
@@ -23,6 +24,7 @@ typedef struct Enemy
     enum SpaceshipType type;
     uint8_t points;
     void (*move) (Enemy*, Player*); //this is a pointer to a function that makes the enemy move
+    void (*updateSprites) (Enemy*);
 };
 
 Enemy enemies[maxEnemyNumber]; //the enemies are stored in this
@@ -50,7 +52,11 @@ void moveFollower(Enemy* follower, Player* player)
     y = y >> follower->accelerationShifts;
     accelerateGameObject(&follower->gameObject, x, y);
     applyDragToGameObject(&follower->gameObject, follower->dragShifts);
-    setRotatedSprite(follower->gameObject.firstSprite, 4, x, y);
+}
+
+void updateFollowerSprites(Enemy* follower)
+{
+    setRotatedSprite(follower->gameObject.firstSprite, 4, follower->gameObject.velx, follower->gameObject.vely);
 }
 
 void initFollower(uint8_t index, Player* player)
@@ -73,4 +79,5 @@ void initFollower(uint8_t index, Player* player)
     initEnemy->type = follower;
     initEnemy->deathTimer = 0;
     initEnemy->move = moveFollower;
+    initEnemy->updateSprites = updateFollowerSprites;
 }
