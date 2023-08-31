@@ -41,14 +41,64 @@ void main()
     Flinger flinger;
     initFlinger(&flinger);
 
+    uint8_t input = 0;
+    uint8_t lastInput = 0;
+
+    uint8_t unpauseTimer = 0; //when something other than 0, the game is paused
+    uint8_t unpauseCounter = 0;
+    //when the game is paused, unpauseTimer is 255. When it is unpaused, it sets to 1 and unpauseCounter sets to unpauseTimer.
+    //unpauseCounter counts down every frame. When it reaches 0, the game stops for a frame and unpauseTimer gets increased, and unpauseCounter sets to unpauseTimer once again.
+    //when unpauseTimer reaches unpauseTimerStart, it sets unpauseTimer to 0 and the game continues running
+
     //game loop
     while(1)
     {
+        lastInput = input;
+        input = joypad();
+        if (input & J_START && !(lastInput & J_START)) //start button pressed
+        {
+            if (unpauseTimer == 0)
+            {
+                HIDE_SPRITES;
+                unpauseTimer = 255;
+            }
+            else if (unpauseTimer == 255)
+            {
+                SHOW_SPRITES;
+                unpauseTimer = 1;
+                unpauseCounter = unpauseTimer;
+            }
+        }
+
+        if (unpauseTimer != 0)
+        {
+            if (unpauseTimer != 255)
+            {
+                unpauseCounter--;
+                if (unpauseCounter == 0)
+                {
+                    unpauseTimer++;
+                    if (unpauseTimer == unpauseTimerStart)
+                    {
+                        unpauseTimer = 0;
+                    }
+                    unpauseCounter = (unpauseTimer >> unpauseCounterShifts) + 1;
+
+                    wait_vbl_done();
+                    continue; //skip game loop
+                }
+            }
+            else
+            {
+                wait_vbl_done();
+                continue; //skip game loop
+            }
+        }
+
         fixed16 x;
         fixed16 y;
         if (player.deathTimer == 0) //that means the player is alive
         {
-            uint8_t input = joypad();
             if (input & J_A) //A is pressed
             {
                 flinger.attached = FALSE;

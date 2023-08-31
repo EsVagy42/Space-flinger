@@ -18,3 +18,6 @@
 
 #define attachedFlingerDragShifts 4
 #define detachedFlingerDragShifts 6
+
+#define unpauseTimerStart 30
+#define unpauseCounterShifts 2
