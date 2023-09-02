@@ -6,20 +6,35 @@
 
 uint8_t enemyUpdate = 0; //used for checking if an enemy needs to be updated in the current frame. Enemies are updated every 4th frame to save on cpu usage
 
-void main()
+//scores and lives are held in Binary Coded Decimal. every digit gets stored in an uint8_t value
+uint8_t score[6] = {0, 0, 0, 0, 0, 0};
+uint8_t lives[2] = {0, 3};
+
+uint8_t enemyTimer = 1; //if it reaches 0, an enemy is loaded and is reset to resetEnemyTimer
+uint8_t resetEnemyTimer = 255;
+
+Player player;
+Flinger flinger;
+
+uint8_t input = 0;
+uint8_t lastInput = 0;
+
+uint8_t unpauseTimer = 0; //when something other than 0, the game is paused
+uint8_t unpauseCounter = 0;
+//when the game is paused, unpauseTimer is 255. When it is unpaused, it sets to 1 and unpauseCounter sets to unpauseTimer.
+//unpauseCounter counts down every frame. When it reaches 0, the game stops for a frame and unpauseTimer gets increased, and unpauseCounter sets to unpauseTimer once again.
+//when unpauseTimer reaches unpauseTimerStart, it sets unpauseTimer to 0 and the game continues running
+
+fixed16 x;
+fixed16 y;
+
+void setup()
 {
     SHOW_SPRITES;
     SHOW_BKG;
     SHOW_WIN;
 
     move_win(0, 136); //for the HUD
-
-    //scores and lives are held in Binary Coded Decimal. every digit gets stored in an uint8_t value
-    uint8_t score[6] = {0, 0, 0, 0, 0, 0};
-    uint8_t lives[2] = {0, 3};
-
-    uint8_t enemyTimer = 1; //if it reaches 0, an enemy is loaded and is reset to resetEnemyTimer
-    uint8_t resetEnemyTimer = 255;
 
     OBP0_REG = 0x1B; //for setting the sprite palette
 
@@ -34,27 +49,23 @@ void main()
     set_bkg_tiles(0, 0, 32, 32, SpaceMap);
 
     //initializing the player
-    Player player;
     initPlayer(&player);
 
     //initializing the flinger
-    Flinger flinger;
     initFlinger(&flinger);
+}
 
-    uint8_t input = 0;
-    uint8_t lastInput = 0;
-
-    uint8_t unpauseTimer = 0; //when something other than 0, the game is paused
-    uint8_t unpauseCounter = 0;
-    //when the game is paused, unpauseTimer is 255. When it is unpaused, it sets to 1 and unpauseCounter sets to unpauseTimer.
-    //unpauseCounter counts down every frame. When it reaches 0, the game stops for a frame and unpauseTimer gets increased, and unpauseCounter sets to unpauseTimer once again.
-    //when unpauseTimer reaches unpauseTimerStart, it sets unpauseTimer to 0 and the game continues running
+void main()
+{
+    setup();
 
     //game loop
     while(1)
     {
         lastInput = input;
         input = joypad();
+
+
         if (input & J_START && !(lastInput & J_START)) //start button pressed
         {
             if (unpauseTimer == 0)
@@ -95,8 +106,7 @@ void main()
             }
         }
 
-        fixed16 x;
-        fixed16 y;
+
         if (player.deathTimer == 0) //that means the player is alive
         {
             if (input & J_A) //A is pressed
