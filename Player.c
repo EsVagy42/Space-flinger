@@ -39,7 +39,7 @@ inline void initPlayer(Player* player)
     player->gameObject.collider.sizex = FIXED(4);
     player->gameObject.collider.sizey = FIXED(4);
     player->deathTimer = 0;
-    player->invincibilityTimer = invincibilityFrames;
+    player->invincibilityTimer = INVINCIBILITY_FRAMES;
 }
 
 inline void initFlinger(Flinger* flinger)
@@ -52,7 +52,7 @@ inline void initFlinger(Flinger* flinger)
     flinger->gameObject.spriteSizex = 1;
     flinger->gameObject.spriteSizey = 1;
     flinger->accelerationShifts = 6;
-    flinger->dragShifts = attachedFlingerDragShifts;
+    flinger->dragShifts = ATTACHED_FLINGER_DRAG_SHIFTS;
     flinger->gameObject.collider.posx = flinger->gameObject.posx;
     flinger->gameObject.collider.posy = flinger->gameObject.posy;
     flinger->gameObject.collider.sizex = FIXED(8);

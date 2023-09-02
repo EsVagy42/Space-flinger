@@ -23,7 +23,7 @@ uint8_t unpauseTimer = 0; //when something other than 0, the game is paused
 uint8_t unpauseCounter = 0;
 //when the game is paused, unpauseTimer is 255. When it is unpaused, it sets to 1 and unpauseCounter sets to unpauseTimer.
 //unpauseCounter counts down every frame. When it reaches 0, the game stops for a frame and unpauseTimer gets increased, and unpauseCounter sets to unpauseTimer once again.
-//when unpauseTimer reaches unpauseTimerStart, it sets unpauseTimer to 0 and the game continues running
+//when unpauseTimer reaches UNPAUSE_TIMER_START, it sets unpauseTimer to 0 and the game continues running
 
 fixed16 x;
 fixed16 y;
@@ -89,11 +89,11 @@ void main()
                 if (unpauseCounter == 0)
                 {
                     unpauseTimer++;
-                    if (unpauseTimer == unpauseTimerStart)
+                    if (unpauseTimer == UNPAUSE_TIMER_START)
                     {
                         unpauseTimer = 0;
                     }
-                    unpauseCounter = (unpauseTimer >> unpauseCounterShifts) + 1;
+                    unpauseCounter = (unpauseTimer >> UNPAUSE_COUNTER_SHIFTS) + 1;
 
                     wait_vbl_done();
                     continue; //skip game loop
@@ -112,7 +112,7 @@ void main()
             if (input & J_A) //A is pressed
             {
                 flinger.attached = FALSE;
-                flinger.dragShifts = detachedFlingerDragShifts;
+                flinger.dragShifts = DETACHED_FLINGER_DRAG_SHIFTS;
             }
             getInput(input, &x, &y);
             accelerateGameObject(&player.gameObject, x, y);
@@ -120,10 +120,10 @@ void main()
         }
         else
         {
-            if (player.deathTimer > playerDeathHaltFrames) //the death animation is playing
+            if (player.deathTimer > PLAYER_DEATH_HALT_FRAMES) //the death animation is playing
             {
                 set_sprite_tile(player.gameObject.firstSprite,
-                    (explosionAnimationFrames - ((player.deathTimer - playerDeathHaltFrames) >> 2)) + explosionOffset);
+                    (EXPLOSION_ANIMATION_FRAMES - ((player.deathTimer - PLAYER_DEATH_HALT_FRAMES) >> 2)) + EXPLOSION_OFFSET);
                 applyDragToGameObject(&player.gameObject, player.dragShifts);
             }
             player.deathTimer--;
@@ -132,7 +132,7 @@ void main()
                 set_sprite_tile(player.gameObject.firstSprite, 0);
                 uint8_t subLives[] = {0, 1};
                 subBCD(lives, subLives, 2);
-                player.invincibilityTimer = invincibilityFrames;
+                player.invincibilityTimer = INVINCIBILITY_FRAMES;
             }
         }
         applyDragToGameObject(&player.gameObject, player.dragShifts);
@@ -141,7 +141,7 @@ void main()
         {
             x = sub(player.gameObject.posx, flinger.gameObject.posx);
             y = sub(player.gameObject.posy, flinger.gameObject.posy);
-            if (abs(x) + abs(y) < flingerDistance) //flinger is repelled because it is too close to the player
+            if (abs(x) + abs(y) < FLINGER_DISTANCE) //flinger is repelled because it is too close to the player
             {
                 x = -x;
                 y = -y;
@@ -160,14 +160,14 @@ void main()
             if (checkCollision(&player.gameObject.collider, &flinger.gameObject.collider))
             {
                 flinger.attached = TRUE;
-                flinger.dragShifts = attachedFlingerDragShifts;
+                flinger.dragShifts = ATTACHED_FLINGER_DRAG_SHIFTS;
             }
         }
         applyDragToGameObject(&flinger.gameObject, flinger.dragShifts);
         updateGameObject(&flinger.gameObject, &player.gameObject);
 
         //updating the enemies
-        for (uint8_t i = 0; i < maxEnemyNumber; i++)
+        for (uint8_t i = 0; i < MAX_ENEMY_NUMBER; i++)
         {
             if (activeEnemies[i])
             {
@@ -176,19 +176,19 @@ void main()
                 {
                     if (checkCollision(&currentEnemy->gameObject.collider, &flinger.gameObject.collider))
                     {
-                        currentEnemy->deathTimer = totalAnimationFrames;
+                        currentEnemy->deathTimer = TOTAL_ANIMATION_FRAMES;
                         currentEnemy->gameObject.spriteSizex = 1;
                         currentEnemy->gameObject.spriteSizey = 1;
                         currentEnemy->points = SpaceshipPoints[currentEnemy->type] + (flinger.attached ? 0 : 1);
                         set_sprite_prop(currentEnemy->gameObject.firstSprite, 0);
-                        set_sprite_tile(currentEnemy->gameObject.firstSprite, explosionOffset);
+                        set_sprite_tile(currentEnemy->gameObject.firstSprite, EXPLOSION_OFFSET);
                         currentEnemy->gameObject.velx = flinger.gameObject.velx;
                         currentEnemy->gameObject.vely = flinger.gameObject.vely;
                         updateGameObject(&currentEnemy->gameObject, &player.gameObject);
                     }
                     else
                     {
-                        if (i == enemyUpdate || i == enemyUpdate + (maxEnemyNumber >> 1)) //the enemy should be updated in the current frame
+                        if (i == enemyUpdate || i == enemyUpdate + (MAX_ENEMY_NUMBER >> 1)) //the enemy should be updated in the current frame
                         {
                             currentEnemy->move(currentEnemy, &player);
                             currentEnemy->updateSprites(currentEnemy);
@@ -206,19 +206,19 @@ void main()
                     }
                     else
                     {
-                        if (currentEnemy->deathTimer == pointFrames) //the score for the enemy should begin showing this frame
+                        if (currentEnemy->deathTimer == POINT_FRAMES) //the score for the enemy should begin showing this frame
                         {
                             addScore(score, currentEnemy->points);
-                            set_sprite_tile(currentEnemy->gameObject.firstSprite, pointOffset + currentEnemy->points);
+                            set_sprite_tile(currentEnemy->gameObject.firstSprite, POINT_OFFSET + currentEnemy->points);
                         }
-                        else if (currentEnemy->deathTimer < pointFrames) //the score for the enemy is being displayed
+                        else if (currentEnemy->deathTimer < POINT_FRAMES) //the score for the enemy is being displayed
                         {
                             scroll_sprite(currentEnemy->gameObject.firstSprite, 0, -1);
                         }
                         else //the death animation is showing
                         {
                             set_sprite_tile(currentEnemy->gameObject.firstSprite,
-                            (explosionAnimationFrames - ((currentEnemy->deathTimer - pointFrames) >> 2)) + explosionOffset);
+                            (EXPLOSION_ANIMATION_FRAMES - ((currentEnemy->deathTimer - POINT_FRAMES) >> 2)) + EXPLOSION_OFFSET);
                             applyDragToGameObject(&currentEnemy->gameObject, currentEnemy->dragShifts);
                             scroll_sprite(currentEnemy->gameObject.firstSprite, INT(currentEnemy->gameObject.velx), INT(currentEnemy->gameObject.vely));
                         }
@@ -228,8 +228,8 @@ void main()
                 {
                     if (checkCollision(&currentEnemy->gameObject.collider, &player.gameObject.collider) && !player.deathTimer && !currentEnemy->deathTimer)
                     {
-                        player.deathTimer = explosionFrames + playerDeathHaltFrames;
-                        flinger.dragShifts = detachedFlingerDragShifts;
+                        player.deathTimer = EXPLOSION_FRAMES + PLAYER_DEATH_HALT_FRAMES;
+                        flinger.dragShifts = DETACHED_FLINGER_DRAG_SHIFTS;
                         flinger.attached = FALSE;
                     }
                 }

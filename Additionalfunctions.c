@@ -7,25 +7,25 @@ void getInput(uint8_t input, fixed16* x, fixed16* y)
 
     if (input & J_UP)
     {
-        *y = -inputSpeed;
+        *y = -INPUT_SPEED;
     }
     if (input & J_DOWN)
     {
-        *y = inputSpeed;
+        *y = INPUT_SPEED;
     }
     if (input & J_LEFT)
     {
-        *x = -inputSpeed;
+        *x = -INPUT_SPEED;
     }
     if (input & J_RIGHT)
     {
-        *x = inputSpeed;
+        *x = INPUT_SPEED;
     }
 
     if (*x != 0 && *y != 0)
     {
-        *x = *x > 0 ? inputSpeedDiagonal : -inputSpeedDiagonal;
-        *y = *y > 0 ? inputSpeedDiagonal : -inputSpeedDiagonal;
+        *x = *x > 0 ? INPUT_SPEED_DIAGONAL : -INPUT_SPEED_DIAGONAL;
+        *y = *y > 0 ? INPUT_SPEED_DIAGONAL : -INPUT_SPEED_DIAGONAL;
     }
 }
 
@@ -33,16 +33,16 @@ inline void showScore(uint8_t score[])
 {
     for (uint8_t i = 0; i < 6; i++)
     {
-        set_win_tile_xy(i + 1, 0, score[i] + numbersOffset);
+        set_win_tile_xy(i + 1, 0, score[i] + NUMBERS_OFFSET);
     }
 }
 
 inline void showLives(uint8_t lives[])
 {
-    set_win_tile_xy(18, 0, numbersOffset - 1);
+    set_win_tile_xy(18, 0, NUMBERS_OFFSET - 1);
     for (uint8_t i = 0; i < 2; i++)
     {
-        set_win_tile_xy(i + 19, 0, lives[i] + numbersOffset);
+        set_win_tile_xy(i + 19, 0, lives[i] + NUMBERS_OFFSET);
     }
 }
 

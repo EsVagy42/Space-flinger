@@ -27,13 +27,13 @@ typedef struct Enemy
     void (*updateSprites) (Enemy*);
 };
 
-Enemy enemies[maxEnemyNumber]; //the enemies are stored in this
-BOOLEAN activeEnemies[maxEnemyNumber]; //if the enemy in enemies at index is active or an open space for an enemy that needs to be loaded
+Enemy enemies[MAX_ENEMY_NUMBER]; //the enemies are stored in this
+BOOLEAN activeEnemies[MAX_ENEMY_NUMBER]; //if the enemy in enemies at index is active or an open space for an enemy that needs to be loaded
 
 //for loading enemies. it allocates the space for an enemy at the returned index in enemies or returns -1 if the allocation was unsuccessful
 inline int8_t loadEnemy()
 {
-    for (uint8_t i = 0; i < maxEnemyNumber; i++)
+    for (uint8_t i = 0; i < MAX_ENEMY_NUMBER; i++)
     {
         if (!activeEnemies[i])
         {
