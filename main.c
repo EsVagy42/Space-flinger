@@ -1,8 +1,8 @@
 #include <gb/gb.h>
 #include "Enemies.c"
-#include "Assets/Spaceships.c"  //sprite tiles
-#include "Assets/Space.c" //background tiles
-#include "Assets/SpaceMap.c" //background map
+#include "Assets/Spaceships.h"  //sprite tiles
+#include "Assets/Space.h" //background tiles
+#include "Assets/SpaceMap.h" //background map
 
 uint8_t enemyUpdate = 0; //used for checking if an enemy needs to be updated in the current frame. Enemies are updated every 4th frame to save on cpu usage
 

@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "stdio.h": "c",
-        "gb.h": "c"
+        "gb.h": "c",
+        "space.h": "c"
     }
 }
