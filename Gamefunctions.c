@@ -106,6 +106,7 @@ inline void playPlayerDeathAnimation()
         subBCD(lives, subLives, 2);
         player.invincibilityTimer = INVINCIBILITY_FRAMES;
     }
+    applyDragToGameObject(&player.gameObject, player.dragShifts);
 }
 
 inline void updateAttachedFlinger()
