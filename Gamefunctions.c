@@ -40,7 +40,7 @@ void setup()
     SHOW_BKG;
     SHOW_WIN;
 
-    move_win(0, 136); //for the HUD
+    move_win(7, 136); //for the HUD
 
     OBP0_REG = 0x1B; //for setting the sprite palette
 

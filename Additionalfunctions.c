@@ -34,16 +34,16 @@ inline void showScore(uint8_t score[])
 {
     for (uint8_t i = 0; i < 6; i++)
     {
-        set_win_tile_xy(i + 1, 0, score[i] + NUMBERS_OFFSET);
+        set_win_tile_xy(i, 0, score[i] + NUMBERS_OFFSET);
     }
 }
 
 inline void showLives(uint8_t lives[])
 {
-    set_win_tile_xy(18, 0, NUMBERS_OFFSET - 1);
+    set_win_tile_xy(17, 0, NUMBERS_OFFSET - 1);
     for (uint8_t i = 0; i < 2; i++)
     {
-        set_win_tile_xy(i + 19, 0, lives[i] + NUMBERS_OFFSET);
+        set_win_tile_xy(i + 18, 0, lives[i] + NUMBERS_OFFSET);
     }
 }
 
