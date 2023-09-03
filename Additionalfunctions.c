@@ -1,4 +1,5 @@
 #include <gb/gb.h>
+#include "Enemies.c"
 
 void getInput(uint8_t input, fixed16* x, fixed16* y)
 {
