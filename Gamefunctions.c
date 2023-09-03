@@ -11,7 +11,7 @@
 #define CURRENTENEMY_HIT (checkCollision(&currentEnemy->gameObject.collider, &flinger.gameObject.collider))
 #define ENEMY_UPDATES_IN_CURRENT_FRAME (i == enemyUpdate || i == enemyUpdate + (MAX_ENEMY_NUMBER >> 1))
 #define PLAYER_INVINCIBLE (player.invincibilityTimer != 0)
-#define PLAYER_HIT (checkCollision(&currentEnemy->gameObject.collider, &player.gameObject.collider) && !player.deathTimer && !currentEnemy->deathTimer)
+#define PLAYER_HIT_BY_CURRENT_ENEMY (checkCollision(&currentEnemy->gameObject.collider, &player.gameObject.collider) && !player.deathTimer && !currentEnemy->deathTimer)
 
 uint8_t enemyUpdate = 0; //used for checking if an enemy needs to be updated in the current frame. Enemies are updated every 4th frame to save on cpu usage
 

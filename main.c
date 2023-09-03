@@ -82,20 +82,18 @@ void main()
                         }
                     }
 
-                    if (PLAYER_INVINCIBLE)
+                    if (PLAYER_HIT_BY_CURRENT_ENEMY && !PLAYER_INVINCIBLE)
                     {
-                        blinkPlayerSprite();
-                    }
-                    else //the player is not invincible
-                    {
-                        if (PLAYER_HIT)
-                        {
-                            setupPlayerDeathAnimation();
-                        }
+                        setupPlayerDeathAnimation();
                     }
                 }
 
                 currentEnemy++;
+            }
+
+            if (PLAYER_INVINCIBLE)
+            {
+                blinkPlayerSprite();
             }
 
             updatePlayerInvincibilityTimer();
