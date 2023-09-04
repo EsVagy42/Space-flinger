@@ -54,6 +54,9 @@ void setup()
 
     set_bkg_tiles(0, 0, 32, 32, SpaceMap);
 
+    const uint8_t pauseText[] = {4, 5, 6, 7, 8, 9};
+    set_win_tiles(7, 1, 6, 1, pauseText);
+
     //initializing the player
     initPlayer(&player);
 
@@ -70,11 +73,13 @@ inline void updateInput()
 inline void pauseGame()
 {
     HIDE_SPRITES;
+    move_win(7, 128);
 }
 
 inline void unPauseGame()
 {
     SHOW_SPRITES;
+    move_win(7, 136);
 }
 
 inline void updatePlayer()
