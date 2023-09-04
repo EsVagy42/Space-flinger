@@ -33,6 +33,24 @@ BOOLEAN paused = FALSE;
 fixed16 x;
 fixed16 y;
 
+void interrupt()
+{
+    switch (LYC_REG)
+    {
+        case 136:
+            LYC_REG = 144;
+            HIDE_SPRITES;
+            break;
+        
+        case 144:
+            LYC_REG = 136;
+            if (!paused)
+            {
+                SHOW_SPRITES;
+            }
+            break;
+    }
+}
 
 void setup()
 {
@@ -56,6 +74,14 @@ void setup()
 
     const uint8_t pauseText[] = {4, 5, 6, 7, 8, 9};
     set_win_tiles(7, 1, 6, 1, pauseText);
+
+    STAT_REG |= STATF_LYC;
+    LYC_REG = 136;
+    CRITICAL
+    {
+        add_LCD(interrupt);
+    }
+    set_interrupts(LCD_IFLAG | VBL_IFLAG);
 
     //initializing the player
     initPlayer(&player);
