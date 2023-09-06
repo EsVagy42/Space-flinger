@@ -80,3 +80,27 @@ void initFollower(uint8_t index, Player* player)
     initEnemy->move = moveFollower;
     initEnemy->updateSprites = updateFollowerSprites;
 }
+
+enum spaceShipFunctionsEnum
+{
+    followerInit
+};
+
+const void* spaceShipFunctions[] =
+{
+    &initFollower
+};
+
+typedef struct Wave Wave;
+
+typedef struct Wave
+{
+    uint8_t initFunctions[8];
+    uint8_t enemyLoadDelay;
+    uint8_t waveCountdown[2];
+};
+
+const Wave waves[] =
+{
+    {{followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit}, 90, {3, 0}}
+};
