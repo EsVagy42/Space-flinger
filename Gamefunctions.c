@@ -12,6 +12,7 @@
 #define ENEMY_UPDATES_IN_CURRENT_FRAME (i == enemyUpdate || i == enemyUpdate + (MAX_ENEMY_NUMBER >> 1))
 #define PLAYER_INVINCIBLE (player.invincibilityTimer != 0)
 #define PLAYER_HIT_BY_CURRENT_ENEMY (checkCollision(&currentEnemy->gameObject.collider, &player.gameObject.collider) && !player.deathTimer && !currentEnemy->deathTimer)
+#define WAVECOUNTDOWN_REACHED_0 (waveCountdown[0] == 0 && waveCountdown[1] == 0)
 
 uint8_t enemyUpdate = 0; //used for checking if an enemy needs to be updated in the current frame. Enemies are updated every 4th frame to save on cpu usage
 
@@ -30,8 +31,32 @@ uint8_t lastInput = 0;
 
 BOOLEAN paused = FALSE;
 
+uint8_t frameCounter = 0; //counts up to 60. used for decreasing the wave timer every second
+uint8_t waveCountdown[2]; //wave timer
+uint8_t enemyLoadTimer;
+uint8_t currentEnemyInWave = 0;
+
+uint8_t currentWaveBCD[] = {0, 0}; //the wave currently loaded
+Wave* currentWave;
+uint8_t waveByTimeBCD[] = {0, 0}; //which wave's countdown is active
+Wave* waveByTime;
+
 fixed16 x;
 fixed16 y;
+
+inline void increaseCurrentWave()
+{
+    uint8_t increaseWave[] = {0, 1};
+    addBCD(currentWaveBCD, increaseWave, 2);
+    currentWave++;
+}
+
+inline void increaseWaveByTime()
+{
+    uint8_t increaseWave[] = {0, 1};
+    addBCD(waveByTimeBCD, increaseWave, 2);
+    waveByTime++;
+}
 
 void interrupt()
 {
@@ -82,6 +107,12 @@ void setup()
         add_LCD(interrupt);
     }
     set_interrupts(LCD_IFLAG | VBL_IFLAG);
+
+    copyBCD(waveCountdown, waves[0].waveCountdown, 2);
+    enemyLoadTimer = waves[0].enemyLoadDelay;
+
+    currentWave = waves;
+    waveByTime = waves;
 
     //initializing the player
     initPlayer(&player);
@@ -260,4 +291,18 @@ inline void deloadEnemy(Enemy* currentEnemy, uint8_t i)
 {
     activeEnemies[i] = FALSE;
     hide_sprite(currentEnemy->gameObject.firstSprite);
+}
+
+inline void loadNextWave()
+{
+    increaseCurrentWave();
+    increaseWaveByTime();
+    copyBCD(waveCountdown, currentWave->waveCountdown, 2);
+    enemyLoadTimer = currentWave->enemyLoadDelay;
+    currentEnemyInWave = 0;
+}
+
+inline void loadNextEnemy()
+{
+    
 }

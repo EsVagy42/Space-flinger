@@ -100,11 +100,34 @@ void main()
 
             updateEnemyUpdateCounter();
 
-            enemyTimer--;
-            if (enemyTimer == 0) //an enemy should be loaded this frame
+            frameCounter++;
+            if (frameCounter >= 60)
             {
-                loadEnemy();
+                frameCounter = 0;
+                uint8_t subtract[] = {0, 1};
+                subBCD(waveCountdown, subtract, 2);
+                if (WAVECOUNTDOWN_REACHED_0)
+                {
+                    loadNextWave();
+                }
             }
+
+            enemyLoadTimer--;
+            if (enemyLoadTimer == 0)
+            {
+                enemyLoadTimer = currentWave->enemyLoadDelay;
+                if (currentEnemyInWave < 8)
+                {
+                    loadNextEnemy();
+                    currentEnemyInWave++;
+                }
+            }
+
+            // enemyTimer--;
+            // if (enemyTimer == 0) //an enemy should be loaded this frame
+            // {
+            //     loadEnemy();
+            // }
 
             updateGameObject(&player.gameObject, &player.gameObject);
 
