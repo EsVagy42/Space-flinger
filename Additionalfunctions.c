@@ -47,6 +47,24 @@ inline void showLives(uint8_t lives[])
     }
 }
 
+inline void showWave(uint8_t wave[])
+{
+    set_win_tile_xy(8, 0, NUMBERS_OFFSET - 2);
+    for (uint8_t i = 0; i < 2; i++)
+    {
+        set_win_tile_xy(i + 9, 0, wave[i] + NUMBERS_OFFSET);
+    }
+}
+
+inline void showTime(uint8_t time[])
+{
+    set_win_tile_xy(12, 0, NUMBERS_OFFSET - 3);
+    for (uint8_t i = 0; i < 2; i++)
+    {
+        set_win_tile_xy(i + 13, 0, time[i] + NUMBERS_OFFSET);
+    }
+}
+
 inline void addScore(uint8_t score[], uint8_t num)
 {
     uint8_t lookup[7][8] = {

@@ -133,6 +133,8 @@ void main()
 
             showScore(score);
             showLives(lives);
+            showWave(currentWaveBCD);
+            showTime(waveCountdown);
 
             moveBackground(&player.gameObject);
         }
