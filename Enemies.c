@@ -86,7 +86,7 @@ enum spaceShipFunctionsEnum
     followerInit
 };
 
-const void* spaceShipFunctions[] =
+const void (*spaceShipFunctions[]) (uint8_t, Player*) =
 {
     &initFollower
 };

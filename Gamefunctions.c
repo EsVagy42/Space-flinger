@@ -113,6 +113,7 @@ void setup()
 
     currentWave = waves;
     waveByTime = waves;
+    currentEnemyInWave = 0;
 
     //initializing the player
     initPlayer(&player);
@@ -304,5 +305,5 @@ inline void loadNextWave()
 
 inline void loadNextEnemy()
 {
-    
+    spaceShipFunctions[currentWave->initFunctions[currentEnemyInWave]](currentEnemyInWave, &player);
 }
