@@ -102,5 +102,5 @@ typedef struct Wave
 
 const Wave waves[] =
 {
-    {{followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit}, 90, {4, 0}}
+    {{followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit}, 180, {4, 0}}
 };

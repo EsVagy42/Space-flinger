@@ -306,4 +306,5 @@ inline void loadNextWave()
 inline void loadNextEnemy()
 {
     spaceShipFunctions[currentWave->initFunctions[currentEnemyInWave]](currentEnemyInWave, &player);
+    activeEnemies[currentEnemyInWave] = TRUE;
 }
