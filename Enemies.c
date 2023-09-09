@@ -67,8 +67,8 @@ void initFollower(uint8_t index, Player* player)
     initEnemy->gameObject.firstSprite = 2 + index;
     initEnemy->gameObject.spriteSizex = 1;
     initEnemy->gameObject.spriteSizey = 1;
-    initEnemy->gameObject.posx = player->gameObject.posx;
-    initEnemy->gameObject.posy = sub(player->gameObject.posy, FIXED(80));
+    initEnemy->gameObject.posx = player->gameObject.posx + (index & 1 ? FIXED(80) : FIXED(-80));
+    initEnemy->gameObject.posy = player->gameObject.posy + (index & 2 ? FIXED(80) : FIXED(-80));
     initEnemy->gameObject.velx = FIXED(0);
     initEnemy->gameObject.vely = FIXED(0);
     initEnemy->gameObject.collider.posx = enemies[index].gameObject.posx;

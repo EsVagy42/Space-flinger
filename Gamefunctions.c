@@ -97,7 +97,7 @@ void setup()
 
     set_bkg_tiles(0, 0, 32, 32, SpaceMap);
 
-    const uint8_t pauseText[] = {4, 5, 6, 7, 8, 9};
+    const uint8_t pauseText[] = {19, 4, 24, 22, 8, 7};
     set_win_tiles(7, 1, 6, 1, pauseText);
 
     STAT_REG |= STATF_LYC;
