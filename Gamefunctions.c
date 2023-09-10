@@ -99,9 +99,6 @@ void setup()
 
     set_bkg_tiles(0, 0, 32, 32, SpaceMap);
 
-    const uint8_t pauseText[] = {19, 4, 24, 22, 8, 7};
-    set_win_tiles(7, 1, 6, 1, pauseText);
-
     STAT_REG |= STATF_LYC;
     LYC_REG = 135;
     CRITICAL
@@ -135,13 +132,14 @@ inline void updateInput()
 inline void pauseGame()
 {
     HIDE_SPRITES;
-    move_win(7, 128);
+    showPauseText();
+    
 }
 
 inline void unPauseGame()
 {
     SHOW_SPRITES;
-    move_win(7, 136);
+    showEmpty();
 }
 
 inline void updatePlayer()
