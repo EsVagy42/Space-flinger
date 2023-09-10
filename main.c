@@ -69,7 +69,6 @@ void main()
                             }
                             updateGameObject(&currentEnemy->gameObject, &player.gameObject);
                         }
-                        enemyCount++;
                     }
                     else //enemy death animation playing
                     {
@@ -88,6 +87,8 @@ void main()
                     {
                         setupPlayerDeathAnimation();
                     }
+
+                    enemyCount++;
                 }
 
                 currentEnemy++;
