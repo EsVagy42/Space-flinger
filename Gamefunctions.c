@@ -61,18 +61,20 @@ inline void increaseWaveByTime()
 void interrupt()
 {
     switch (LYC_REG)
-    {
-        case 136:
-            LYC_REG = 144;
-            HIDE_SPRITES;
-            break;
-        
-        case 144:
-            LYC_REG = 136;
+    {    
+        case 7:
             if (!paused)
             {
                 SHOW_SPRITES;
             }
+            HIDE_WIN;
+            LYC_REG = 135;
+            break;
+
+        case 135:
+            HIDE_SPRITES;
+            SHOW_WIN;
+            LYC_REG = 7;
             break;
     }
 }
@@ -83,7 +85,7 @@ void setup()
     SHOW_BKG;
     SHOW_WIN;
 
-    move_win(7, 136); //for the HUD
+    move_win(7, 0); //for the HUD
 
     OBP0_REG = 0x1B; //for setting the sprite palette
 
@@ -101,12 +103,14 @@ void setup()
     set_win_tiles(7, 1, 6, 1, pauseText);
 
     STAT_REG |= STATF_LYC;
-    LYC_REG = 136;
+    LYC_REG = 135;
     CRITICAL
     {
         add_LCD(interrupt);
     }
     set_interrupts(LCD_IFLAG | VBL_IFLAG);
+
+    
 
     copyBCD(waveCountdown, waves[0].waveCountdown, 2);
     enemyLoadTimer = waves[0].enemyLoadDelay;
