@@ -3,13 +3,15 @@
 
 enum SpaceshipType
 {
-    follower
+    follower,
+    spiraler
 };
 
 //how many points should a given spaceship earn
 uint8_t SpaceshipPoints[] =
 {
-    0
+    0,
+    1
 };
 
 typedef struct Enemy Enemy;
@@ -42,6 +44,9 @@ inline int8_t getAvailableEnemySpot()
     }
     return -1;
 }
+
+
+
 
 void moveFollower(Enemy* follower, Player* player)
 {
@@ -81,14 +86,98 @@ void initFollower(uint8_t index, Player* player)
     initEnemy->updateSprites = updateFollowerSprites;
 }
 
+
+
+
+void moveSpiralerPositive(Enemy* spiraler, Player* player)
+{
+    fixed16 x = sub(player->gameObject.posx, spiraler->gameObject.posx);
+    fixed16 y = sub(player->gameObject.posy, spiraler->gameObject.posy);
+    x = x >> spiraler->accelerationShifts;
+    y = y >> spiraler->accelerationShifts;
+    x += -(y >> 2);
+    y += (x >> 1);
+    accelerateGameObject(&spiraler->gameObject, x, y);
+    applyDragToGameObject(&spiraler->gameObject, spiraler->dragShifts);
+}
+
+void moveSpiralerNegative(Enemy* spiraler, Player* player)
+{
+    fixed16 x = sub(player->gameObject.posx, spiraler->gameObject.posx);
+    fixed16 y = sub(player->gameObject.posy, spiraler->gameObject.posy);
+    x = x >> spiraler->accelerationShifts;
+    y = y >> spiraler->accelerationShifts;
+    x += (y >> 2);
+    y += -(x >> 1);
+    accelerateGameObject(&spiraler->gameObject, x, y);
+    applyDragToGameObject(&spiraler->gameObject, spiraler->dragShifts);
+}
+
+void updateSpiralerSprites(Enemy* spiraler)
+{
+    setRotatedSprite(spiraler->gameObject.firstSprite, 13, spiraler->gameObject.velx, spiraler->gameObject.vely);
+}
+
+void initSpiralerPositive(uint8_t index, Player* player)
+{
+    Enemy* initEnemy = &enemies[index];
+
+    initEnemy->accelerationShifts = 8;
+    initEnemy->dragShifts = 4;
+    initEnemy->gameObject.firstSprite = 2 + index;
+    initEnemy->gameObject.spriteSizex = 1;
+    initEnemy->gameObject.spriteSizey = 1;
+    initEnemy->gameObject.posx = player->gameObject.posx + (index & 1 ? FIXED(80) : FIXED(-80));
+    initEnemy->gameObject.posy = player->gameObject.posy + (index & 2 ? FIXED(80) : FIXED(-80));
+    initEnemy->gameObject.velx = FIXED(0);
+    initEnemy->gameObject.vely = FIXED(0);
+    initEnemy->gameObject.collider.posx = enemies[index].gameObject.posx;
+    initEnemy->gameObject.collider.posy = enemies[index].gameObject.posy;
+    initEnemy->gameObject.collider.sizex = FIXED(8);
+    initEnemy->gameObject.collider.sizey = FIXED(8);
+    initEnemy->type = spiraler;
+    initEnemy->deathTimer = 0;
+    initEnemy->move = moveSpiralerPositive;
+    initEnemy->updateSprites = updateSpiralerSprites;
+}
+
+void initSpiralerNegative(uint8_t index, Player* player)
+{
+    Enemy* initEnemy = &enemies[index];
+
+    initEnemy->accelerationShifts = 8;
+    initEnemy->dragShifts = 4;
+    initEnemy->gameObject.firstSprite = 2 + index;
+    initEnemy->gameObject.spriteSizex = 1;
+    initEnemy->gameObject.spriteSizey = 1;
+    initEnemy->gameObject.posx = player->gameObject.posx + (index & 1 ? FIXED(80) : FIXED(-80));
+    initEnemy->gameObject.posy = player->gameObject.posy + (index & 2 ? FIXED(80) : FIXED(-80));
+    initEnemy->gameObject.velx = FIXED(0);
+    initEnemy->gameObject.vely = FIXED(0);
+    initEnemy->gameObject.collider.posx = enemies[index].gameObject.posx;
+    initEnemy->gameObject.collider.posy = enemies[index].gameObject.posy;
+    initEnemy->gameObject.collider.sizex = FIXED(8);
+    initEnemy->gameObject.collider.sizey = FIXED(8);
+    initEnemy->type = spiraler;
+    initEnemy->deathTimer = 0;
+    initEnemy->move = moveSpiralerNegative;
+    initEnemy->updateSprites = updateSpiralerSprites;
+}
+
+
+
 enum spaceShipFunctionsEnum
 {
-    followerInit
+    followerInit,
+    spiralerInitPositive,
+    spiralerInitNegative
 };
 
 const void (*spaceShipFunctions[]) (uint8_t, Player*) =
 {
-    &initFollower
+    &initFollower,
+    &initSpiralerPositive,
+    &initSpiralerNegative
 };
 
 typedef struct Wave Wave;
@@ -102,5 +191,12 @@ typedef struct Wave
 
 const Wave waves[] =
 {
-    {{followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit}, 180, {4, 0}}
+    {{followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit}, 180, {4, 0}},
+    {{followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit}, 120, {3, 0}},
+    {{followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, spiralerInitPositive, spiralerInitNegative}, 180, {4, 0}},
+    {{followerInit, followerInit, spiralerInitPositive, spiralerInitNegative, followerInit, followerInit, followerInit, followerInit}, 120, {3, 0}},
+    {{followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit, followerInit}, 60, {2, 0}},
+    {{spiralerInitPositive, spiralerInitNegative, followerInit, followerInit, spiralerInitPositive, spiralerInitNegative, followerInit, followerInit}, 180, {4, 0}},
+    {{spiralerInitPositive, spiralerInitNegative, spiralerInitPositive, spiralerInitNegative, spiralerInitPositive, spiralerInitNegative, spiralerInitPositive, spiralerInitNegative}, 240, {6, 0}},
+    {{followerInit, followerInit, spiralerInitPositive, spiralerInitNegative, followerInit, followerInit, followerInit, followerInit}, 90, {3, 0}},
 };

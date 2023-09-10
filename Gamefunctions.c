@@ -36,7 +36,7 @@ uint8_t waveCountdown[2]; //wave timer
 uint8_t enemyLoadTimer;
 uint8_t currentEnemyInWave = 0;
 
-uint8_t currentWaveBCD[] = {0, 0}; //the wave currently loaded
+uint8_t currentWaveBCD[] = {0, 1};
 Wave* currentWave;
 
 uint8_t messageTimer = 0; //gets decreased every frame. one it hits 0, the current message gets cleared from the screen
@@ -316,6 +316,10 @@ inline void loadNextWave()
     copyBCD(waveCountdown, currentWave->waveCountdown, 2);
     enemyLoadTimer = currentWave->enemyLoadDelay;
     currentEnemyInWave = 0;
+    for (uint8_t i = 0; i < MAX_ENEMY_NUMBER; i++)
+    {
+        deloadEnemy(&enemies[i], i);
+    }
 }
 
 inline void loadNextEnemy()
