@@ -38,8 +38,8 @@ uint8_t currentEnemyInWave = 0;
 
 uint8_t currentWaveBCD[] = {0, 0}; //the wave currently loaded
 Wave* currentWave;
-uint8_t waveByTimeBCD[] = {0, 0}; //which wave's countdown is active
-Wave* waveByTime;
+
+uint8_t messageTimer = 0; //gets decreased every frame. one it hits 0, the current message gets cleared from the screen
 
 fixed16 x;
 fixed16 y;
@@ -49,13 +49,6 @@ inline void increaseCurrentWave()
     uint8_t increaseWave[] = {0, 1};
     addBCD(currentWaveBCD, increaseWave, 2);
     currentWave++;
-}
-
-inline void increaseWaveByTime()
-{
-    uint8_t increaseWave[] = {0, 1};
-    addBCD(waveByTimeBCD, increaseWave, 2);
-    waveByTime++;
 }
 
 void interrupt()
@@ -113,7 +106,6 @@ void setup()
     enemyLoadTimer = waves[0].enemyLoadDelay;
 
     currentWave = waves;
-    waveByTime = waves;
     currentEnemyInWave = 0;
 
     //initializing the player
@@ -121,6 +113,28 @@ void setup()
 
     //initializing the flinger
     initFlinger(&flinger);
+}
+
+inline void showPauseText()
+{
+    const uint8_t pauseText[] = {0, 0, 0, 0, 0, 0, 0, 19, 4, 24, 22, 8, 7, 0, 0, 0, 0, 0, 0, 0};
+    set_win_tiles(0, 1, 20, 1, pauseText);
+}
+
+inline void showEmptyText()
+{
+    set_win_tiles(0, 1, 20, 1, empty);
+}
+
+inline void showTimeBonusText()
+{
+    uint8_t bonus[6] = {0, 0, 0, 0, waveCountdown[0], waveCountdown[1]};
+    addBCD(score, bonus, 6);
+    set_win_tiles(0, 1, 15, 1, timeText);
+    set_win_tile_xy(15, 1, waveCountdown[0] + NUMBERS_OFFSET);
+    set_win_tile_xy(16, 1, waveCountdown[1] + NUMBERS_OFFSET);
+    set_win_tiles(17, 1, 3, 1, timeText);
+    messageTimer = 120;
 }
 
 inline void updateInput()
@@ -139,7 +153,7 @@ inline void pauseGame()
 inline void unPauseGame()
 {
     SHOW_SPRITES;
-    showEmpty();
+    showEmptyText();
 }
 
 inline void updatePlayer()
@@ -299,7 +313,6 @@ inline void deloadEnemy(Enemy* currentEnemy, uint8_t i)
 inline void loadNextWave()
 {
     increaseCurrentWave();
-    increaseWaveByTime();
     copyBCD(waveCountdown, currentWave->waveCountdown, 2);
     enemyLoadTimer = currentWave->enemyLoadDelay;
     currentEnemyInWave = 0;

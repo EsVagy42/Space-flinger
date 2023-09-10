@@ -21,3 +21,7 @@
 
 #define UNPAUSE_TIMER_START 30
 #define UNPAUSE_COUNTER_SHIFTS 2
+
+const uint8_t pauseText[] = {0, 0, 0, 0, 0, 0, 0, 19, 4, 24, 22, 8, 7, 0, 0, 0, 0, 0, 0, 0};
+const uint8_t empty[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+const uint8_t timeText[] = {0, 0, 0, 23, 12, 16, 8, 0, 5, 18, 17, 24, 22, 0, 0, 0, 0, 0, 0, 0};

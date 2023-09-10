@@ -47,9 +47,10 @@ void main()
             {
                 updateDetachedFlinger();
             }
-
+            
             //updating the enemies
             Enemy* currentEnemy = &enemies[0];
+            uint8_t enemyCount = 0;
             for (uint8_t i = 0; i < MAX_ENEMY_NUMBER; i++)
             {
                 if (CURRENTENEMY_ACTIVE)
@@ -68,6 +69,7 @@ void main()
                             }
                             updateGameObject(&currentEnemy->gameObject, &player.gameObject);
                         }
+                        enemyCount++;
                     }
                     else //enemy death animation playing
                     {
@@ -89,6 +91,12 @@ void main()
                 }
 
                 currentEnemy++;
+            }
+
+            if (enemyCount == 0 && currentEnemyInWave == 8)
+            {
+                showTimeBonusText();
+                loadNextWave();
             }
 
             if (PLAYER_INVINCIBLE)
@@ -135,6 +143,15 @@ void main()
             showLives(lives);
             showWave(currentWaveBCD);
             showTime(waveCountdown);
+
+            if (messageTimer != 0)
+            {
+                messageTimer--;
+                if (messageTimer == 0)
+                {
+                    showEmptyText();
+                }
+            }
 
             moveBackground(&player.gameObject);
         }

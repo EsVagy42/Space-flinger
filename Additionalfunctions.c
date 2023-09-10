@@ -65,18 +65,6 @@ inline void showTime(uint8_t time[])
     }
 }
 
-inline void showPauseText()
-{
-    const uint8_t pauseText[] = {0, 0, 0, 0, 0, 0, 0, 19, 4, 24, 22, 8, 7, 0, 0, 0, 0, 0, 0, 0};
-    set_win_tiles(0, 1, 20, 1, pauseText);
-}
-
-inline void showEmpty()
-{
-    const uint8_t empty[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    set_win_tiles(0, 1, 20, 1, empty);
-}
-
 inline void addScore(uint8_t score[], uint8_t num)
 {
     uint8_t lookup[7][8] = {
