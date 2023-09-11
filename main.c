@@ -1,6 +1,9 @@
 #include <gb/gb.h>
 #include "Gamefunctions.c"
 
+Enemy* currentEnemy;
+uint8_t enemyCount;
+
 void main()
 {
     setup();
@@ -49,9 +52,9 @@ void main()
             }
             
             //updating the enemies
-            Enemy* currentEnemy = &enemies[0];
-            uint8_t enemyCount = 0;
-            for (uint8_t i = 0; i < MAX_ENEMY_NUMBER; i++)
+            currentEnemy = &enemies[0];
+            enemyCount = 0;
+            for (currentEnemyIndex = 0; currentEnemyIndex < MAX_ENEMY_NUMBER; currentEnemyIndex++)
             {
                 if (CURRENTENEMY_ACTIVE)
                 {
@@ -75,7 +78,7 @@ void main()
                         currentEnemy->deathTimer--;
                         if (currentEnemy->deathTimer == 0)
                         {
-                            deloadEnemy(currentEnemy, i);
+                            deloadEnemy(currentEnemy, currentEnemyIndex);
                         }
                         else
                         {
@@ -115,6 +118,7 @@ void main()
                 frameCounter = 0;
                 uint8_t subtract[] = {0, 1};
                 subBCD(waveCountdown, subtract, 2);
+                showTime(waveCountdown);
                 if (WAVECOUNTDOWN_REACHED_0)
                 {
                     loadNextWave();
@@ -139,11 +143,6 @@ void main()
             // }
 
             updateGameObject(&player.gameObject, &player.gameObject);
-
-            showScore(score);
-            showLives(lives);
-            showWave(currentWaveBCD);
-            showTime(waveCountdown);
 
             if (messageTimer != 0)
             {

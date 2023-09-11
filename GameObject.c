@@ -69,13 +69,14 @@ void applyDragToGameObject(GameObject* go, int8_t dragRatioShifts)
     }
 }
 
+BOOLEAN xsmaller;
 void setRotatedSprite(int8_t sprite, int8_t tile, fixed16 x, fixed16 y)
 {
     if (x == FIXED(0) && y == FIXED(0))
     {
         return;
     }
-    BOOLEAN xsmaller = abs(x) < abs(y);
+    xsmaller = abs(x) < abs(y);
     if ((abs(xsmaller ? x : y) << 1) < abs(xsmaller ? y : x))
     {
         if (xsmaller)
@@ -95,6 +96,7 @@ void setRotatedSprite(int8_t sprite, int8_t tile, fixed16 x, fixed16 y)
         set_sprite_prop(sprite, (x > 0 ? S_FLIPX : 0) | (y > 0 ? S_FLIPY : 0));
     }
 }
+
 
 inline void moveBackground(GameObject* player) //move the background relative to the player
 {

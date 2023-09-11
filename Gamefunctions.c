@@ -6,15 +6,15 @@
 
 #define START_BUTTON_PRESSED (input & J_START && !(lastInput && J_START))
 #define PLAYER_ALIVE (player.deathTimer == 0)
-#define CURRENTENEMY_ACTIVE (activeEnemies[i])
+#define CURRENTENEMY_ACTIVE (activeEnemies[currentEnemyIndex])
 #define CURRENTENEMY_ALIVE (currentEnemy->deathTimer == 0)
 #define CURRENTENEMY_HIT (checkCollision(&currentEnemy->gameObject.collider, &flinger.gameObject.collider))
-#define ENEMY_UPDATES_IN_CURRENT_FRAME (i == enemyUpdate || i == enemyUpdate + (MAX_ENEMY_NUMBER >> 1))
+#define ENEMY_UPDATES_IN_CURRENT_FRAME (currentEnemyIndex == enemyUpdate || currentEnemyIndex == enemyUpdate + (MAX_ENEMY_NUMBER >> 1))
 #define PLAYER_INVINCIBLE (player.invincibilityTimer != 0)
 #define PLAYER_HIT_BY_CURRENT_ENEMY (checkCollision(&currentEnemy->gameObject.collider, &player.gameObject.collider) && !player.deathTimer && !currentEnemy->deathTimer)
 #define WAVECOUNTDOWN_REACHED_0 (waveCountdown[0] == 0 && waveCountdown[1] == 0)
 
-uint8_t enemyUpdate = 0; //used for checking if an enemy needs to be updated in the current frame. Enemies are updated every 4th frame to save on cpu usage
+int8_t enemyUpdate = 0; //used for checking if an enemy needs to be updated in the current frame. Enemies are updated every 4th frame to save on cpu usage
 
 //scores and lives are held in Binary Coded Decimal. every digit gets stored in an uint8_t value
 uint8_t score[6] = {0, 0, 0, 0, 0, 0};
@@ -41,6 +41,8 @@ Wave* currentWave;
 
 uint8_t messageTimer = 0; //gets decreased every frame. one it hits 0, the current message gets cleared from the screen
 
+int8_t currentEnemyIndex = 0;
+
 fixed16 x;
 fixed16 y;
 
@@ -48,6 +50,7 @@ inline void increaseCurrentWave()
 {
     uint8_t increaseWave[] = {0, 1};
     addBCD(currentWaveBCD, increaseWave, 2);
+    showWave(currentWaveBCD);
     currentWave++;
 }
 
@@ -113,11 +116,16 @@ void setup()
 
     //initializing the flinger
     initFlinger(&flinger);
+
+
+    showScore(score);
+    showLives(lives);
+    showWave(currentWaveBCD);
+    showTime(waveCountdown);
 }
 
 inline void showPauseText()
 {
-    const uint8_t pauseText[] = {0, 0, 0, 0, 0, 0, 0, 19, 4, 24, 22, 8, 7, 0, 0, 0, 0, 0, 0, 0};
     set_win_tiles(0, 1, 20, 1, pauseText);
 }
 
@@ -130,6 +138,7 @@ inline void showTimeBonusText()
 {
     uint8_t bonus[6] = {0, 0, 0, 0, waveCountdown[0], waveCountdown[1]};
     addBCD(score, bonus, 6);
+    showScore(score);
     set_win_tiles(0, 1, 15, 1, timeText);
     set_win_tile_xy(15, 1, waveCountdown[0] + NUMBERS_OFFSET);
     set_win_tile_xy(16, 1, waveCountdown[1] + NUMBERS_OFFSET);
@@ -183,6 +192,7 @@ inline void playPlayerDeathAnimation()
         set_sprite_tile(player.gameObject.firstSprite, 0);
         uint8_t subLives[] = {0, 1};
         subBCD(lives, subLives, 2);
+        showLives(lives);
         player.invincibilityTimer = INVINCIBILITY_FRAMES;
     }
     applyDragToGameObject(&player.gameObject, player.dragShifts);
@@ -244,6 +254,7 @@ inline void playEnemyDeathAnimation(Enemy* currentEnemy)
     if (currentEnemy->deathTimer == POINT_FRAMES) //the score for the enemy should begin showing this frame
     {
         addScore(score, currentEnemy->points);
+        showScore(score);
         set_sprite_tile(currentEnemy->gameObject.firstSprite, POINT_OFFSET + currentEnemy->points);
     }
     else if (currentEnemy->deathTimer < POINT_FRAMES) //the score for the enemy is being displayed
@@ -310,15 +321,16 @@ inline void deloadEnemy(Enemy* currentEnemy, uint8_t i)
     hide_sprite(currentEnemy->gameObject.firstSprite);
 }
 
+uint8_t deloadEnemyIndex;
 inline void loadNextWave()
 {
     increaseCurrentWave();
     copyBCD(waveCountdown, currentWave->waveCountdown, 2);
     enemyLoadTimer = currentWave->enemyLoadDelay;
     currentEnemyInWave = 0;
-    for (uint8_t i = 0; i < MAX_ENEMY_NUMBER; i++)
+    for (deloadEnemyIndex = 0; deloadEnemyIndex < MAX_ENEMY_NUMBER; deloadEnemyIndex++)
     {
-        deloadEnemy(&enemies[i], i);
+        deloadEnemy(&enemies[deloadEnemyIndex], deloadEnemyIndex);
     }
 }
 

@@ -132,16 +132,18 @@ void rotate(fixed16* x, fixed16* y, fixed16 angle) {
     *y = mul(*y, CORRECTION_FACTOR);
 }
 
+int8_t BCDindex = 0;
+
 //for binary coded decimal numbers. the digits of the decimal number are stored in an uint8_t array
 inline void addBCD(uint8_t arr1[], uint8_t arr2[], uint8_t size)
 {
     BOOLEAN carry = FALSE;
-    for (int8_t i = size - 1; i >= 0; i--)
+    for (BCDindex = size - 1; BCDindex >= 0; BCDindex--)
     {
-        arr1[i] += arr2[i] + (carry ? 1 : 0);
-        if (arr1[i] >= 0x0A)
+        arr1[BCDindex] += arr2[BCDindex] + (carry ? 1 : 0);
+        if (arr1[BCDindex] >= 0x0A)
         {
-            arr1[i] -= 0x0A;
+            arr1[BCDindex] -= 0x0A;
             carry = TRUE;
         }
         else
@@ -154,12 +156,12 @@ inline void addBCD(uint8_t arr1[], uint8_t arr2[], uint8_t size)
 inline void subBCD(uint8_t arr1[], uint8_t arr2[], uint8_t size)
 {
     BOOLEAN borrow = FALSE;
-    for (int8_t i = size - 1; i >= 0; i--)
+    for (BCDindex = size - 1; BCDindex >= 0; BCDindex--)
     {
-        arr1[i] -= arr2[i] + (borrow ? 1 : 0);
-        if (arr1[i] >= 0x0A)
+        arr1[BCDindex] -= arr2[BCDindex] + (borrow ? 1 : 0);
+        if (arr1[BCDindex] >= 0x0A)
         {
-            arr1[i] += 0x0A;
+            arr1[BCDindex] += 0x0A;
             borrow = TRUE;
         }
         else
@@ -169,10 +171,10 @@ inline void subBCD(uint8_t arr1[], uint8_t arr2[], uint8_t size)
     }
 }
 
-inline void copyBCD(uint8_t arr1[], uint8_t arr2[], uint8_t size)
+inline void copyBCD(uint8_t arr1[], uint8_t arr2[], int8_t size)
 {
-    for (uint8_t i = 0; i < size; i++)
+    for (BCDindex = 0; BCDindex < size; BCDindex++)
     {
-        arr1[i] = arr2[i];
+        arr1[BCDindex] = arr2[BCDindex];
     }
 }

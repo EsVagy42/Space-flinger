@@ -1,83 +1,87 @@
 #include <gb/gb.h>
 #include "Enemies.c"
 
+uint8_t showIndex = 0;
+
 void getInput(uint8_t input, fixed16* x, fixed16* y)
 {
-    *x = FIXED(0);
-    *y = FIXED(0);
-
-    if (input & J_UP)
+    switch (input)
     {
-        *y = -INPUT_SPEED;
-    }
-    if (input & J_DOWN)
-    {
-        *y = INPUT_SPEED;
-    }
-    if (input & J_LEFT)
-    {
-        *x = -INPUT_SPEED;
-    }
-    if (input & J_RIGHT)
-    {
-        *x = INPUT_SPEED;
-    }
-
-    if (*x != 0 && *y != 0)
-    {
-        *x = *x > 0 ? INPUT_SPEED_DIAGONAL : -INPUT_SPEED_DIAGONAL;
-        *y = *y > 0 ? INPUT_SPEED_DIAGONAL : -INPUT_SPEED_DIAGONAL;
+        case J_UP:
+            *x = FIXED(0);
+            *y = -INPUT_SPEED;
+            break;
+        case J_DOWN:
+            *x = FIXED(0);
+            *y = INPUT_SPEED;
+            break;
+        case J_LEFT:
+            *x = -INPUT_SPEED;
+            *y = FIXED(0);
+            break;
+        case J_RIGHT:
+            *x = INPUT_SPEED;
+            *y = FIXED(0);
+            break;
+        case J_UP | J_LEFT:
+            *x = -INPUT_SPEED_DIAGONAL;
+            *y = -INPUT_SPEED_DIAGONAL;
+            break;
+        case J_UP | J_RIGHT:
+            *x = INPUT_SPEED_DIAGONAL;
+            *y = -INPUT_SPEED_DIAGONAL;
+            break;
+        case J_DOWN | J_LEFT:
+            *x = -INPUT_SPEED_DIAGONAL;
+            *y = INPUT_SPEED_DIAGONAL;
+            break;
+        case J_DOWN | J_RIGHT:
+            *x = INPUT_SPEED_DIAGONAL;
+            *y = INPUT_SPEED_DIAGONAL;
+            break;
+        default:
+            *x = FIXED(0);
+            *y = FIXED(0);
     }
 }
 
+
 inline void showScore(uint8_t score[])
 {
-    for (uint8_t i = 0; i < 6; i++)
+    for (showIndex = 0; showIndex < 6; showIndex++)
     {
-        set_win_tile_xy(i, 0, score[i] + NUMBERS_OFFSET);
+        set_win_tile_xy(showIndex, 0, score[showIndex] + NUMBERS_OFFSET);
     }
 }
 
 inline void showLives(uint8_t lives[])
 {
     set_win_tile_xy(17, 0, NUMBERS_OFFSET - 1);
-    for (uint8_t i = 0; i < 2; i++)
+    for (showIndex = 0; showIndex < 2; showIndex++)
     {
-        set_win_tile_xy(i + 18, 0, lives[i] + NUMBERS_OFFSET);
+        set_win_tile_xy(showIndex + 18, 0, lives[showIndex] + NUMBERS_OFFSET);
     }
 }
 
 inline void showWave(uint8_t wave[])
 {
     set_win_tile_xy(8, 0, NUMBERS_OFFSET - 2);
-    for (uint8_t i = 0; i < 2; i++)
+    for (showIndex = 0; showIndex < 2; showIndex++)
     {
-        set_win_tile_xy(i + 9, 0, wave[i] + NUMBERS_OFFSET);
+        set_win_tile_xy(showIndex + 9, 0, wave[showIndex] + NUMBERS_OFFSET);
     }
 }
 
 inline void showTime(uint8_t time[])
 {
     set_win_tile_xy(12, 0, NUMBERS_OFFSET - 3);
-    for (uint8_t i = 0; i < 2; i++)
+    for (showIndex = 0; showIndex < 2; showIndex++)
     {
-        set_win_tile_xy(i + 13, 0, time[i] + NUMBERS_OFFSET);
+        set_win_tile_xy(showIndex + 13, 0, time[showIndex] + NUMBERS_OFFSET);
     }
 }
 
 inline void addScore(uint8_t score[], uint8_t num)
 {
-    uint8_t lookup[7][8] = {
-        {0, 0, 0, 0, 1, 0},
-        {0, 0, 0, 0, 2, 5},
-        {0, 0, 0, 0, 5, 0},
-        {0, 0, 0, 1, 0, 0},
-        {0, 0, 0, 2, 5 ,0},
-        {0 ,0 ,0 ,5 ,0 ,0},
-        {0 ,0 ,1 ,0 ,0 ,0}
-    };
-
-    uint8_t *addScore = lookup[num];
-
-    addBCD(score, addScore, 6);
+    addBCD(score, lookup[num], 6);
 }
