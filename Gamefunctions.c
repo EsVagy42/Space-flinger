@@ -238,8 +238,8 @@ inline void setupEnemyDeathAnimation(Enemy* currentEnemy)
     currentEnemy->points = SpaceshipPoints[currentEnemy->type] + (flinger.attached ? 0 : 1);
     set_sprite_prop(currentEnemy->gameObject.firstSprite, 0);
     set_sprite_tile(currentEnemy->gameObject.firstSprite, EXPLOSION_OFFSET);
-    currentEnemy->gameObject.velx = flinger.gameObject.velx;
-    currentEnemy->gameObject.vely = flinger.gameObject.vely;
+    currentEnemy->gameObject.velx = flinger.gameObject.velx >> 2;
+    currentEnemy->gameObject.vely = flinger.gameObject.vely >> 2;
     updateGameObject(&currentEnemy->gameObject, &player.gameObject);
 }
 
