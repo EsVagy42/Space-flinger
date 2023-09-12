@@ -51,7 +51,7 @@ inline void initFlinger(Flinger* flinger)
     flinger->gameObject.firstSprite = 1;
     flinger->gameObject.spriteSizex = 1;
     flinger->gameObject.spriteSizey = 1;
-    flinger->accelerationShifts = 6;
+    flinger->accelerationShifts = 5;
     flinger->dragShifts = ATTACHED_FLINGER_DRAG_SHIFTS;
     flinger->gameObject.collider.posx = flinger->gameObject.posx;
     flinger->gameObject.collider.posy = flinger->gameObject.posy;

@@ -16,7 +16,7 @@
 #define INPUT_SPEED FIXED(.3) //this number is output by the getInput function for x or y
 #define INPUT_SPEED_DIAGONAL FIXED(.2121) //this number is output by the getInput function for x or y if more than one direction is pressed
 
-#define ATTACHED_FLINGER_DRAG_SHIFTS 4
+#define ATTACHED_FLINGER_DRAG_SHIFTS 5
 #define DETACHED_FLINGER_DRAG_SHIFTS 6
 
 #define UNPAUSE_TIMER_START 30
