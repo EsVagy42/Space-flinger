@@ -4,7 +4,7 @@
 #include "Assets/Space.c" //background tiles
 #include "Assets/SpaceMap.c" //background map
 
-#define START_BUTTON_PRESSED (input & J_START && !(lastInput && J_START))
+#define START_BUTTON_PRESSED (input & J_START & ~(lastInput & J_START))
 #define PLAYER_ALIVE (player.deathTimer == 0)
 #define CURRENTENEMY_ACTIVE (activeEnemies[currentEnemyIndex])
 #define CURRENTENEMY_ALIVE (currentEnemy->deathTimer == 0)

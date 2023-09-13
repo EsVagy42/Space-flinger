@@ -5,7 +5,7 @@ uint8_t showIndex = 0;
 
 void getInput(uint8_t input, fixed16* x, fixed16* y)
 {
-    switch (input)
+    switch (input & (J_UP | J_DOWN | J_LEFT | J_RIGHT))
     {
         case J_UP:
             *x = FIXED(0);
