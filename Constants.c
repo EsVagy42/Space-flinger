@@ -1,6 +1,7 @@
 #define MAX_ENEMY_NUMBER 8 //number of enemies allowed
 
 #define FLINGER_DISTANCE FIXED(13) //if the flinger gets closer to the spaceship than this, it will be repelled
+#define FLINGER_INACTIVE_SPEED FIXED(.125)//if the flinger slows below this speed, it becomes inactive
 
 #define EXPLOSION_FRAMES 20 //for animation
 #define POINT_FRAMES 30  //for animation

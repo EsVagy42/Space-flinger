@@ -8,7 +8,7 @@
 #define PLAYER_ALIVE (player.deathTimer == 0)
 #define CURRENTENEMY_ACTIVE (activeEnemies[currentEnemyIndex])
 #define CURRENTENEMY_ALIVE (currentEnemy->deathTimer == 0)
-#define CURRENTENEMY_HIT (checkCollision(&currentEnemy->gameObject.collider, &flinger.gameObject.collider))
+#define CURRENTENEMY_HIT (checkCollision(&currentEnemy->gameObject.collider, &flinger.gameObject.collider) && flinger.active)
 #define ENEMY_UPDATES_IN_CURRENT_FRAME (currentEnemyIndex == enemyUpdate || currentEnemyIndex == enemyUpdate + (MAX_ENEMY_NUMBER >> 1))
 #define PLAYER_INVINCIBLE (player.invincibilityTimer != 0)
 #define PLAYER_HIT_BY_CURRENT_ENEMY (checkCollision(&currentEnemy->gameObject.collider, &player.gameObject.collider) && !player.deathTimer && !currentEnemy->deathTimer)
@@ -84,6 +84,7 @@ void setup()
     move_win(7, 0); //for the HUD
 
     OBP0_REG = 0x1B; //for setting the sprite palette
+    OBP1_REG = 0x6F; //for setting the inactive sprite palette
 
     set_sprite_data(0, 128, SpaceShipTiles);
 
@@ -225,6 +226,13 @@ inline void updateDetachedFlinger()
     {
         flinger.attached = TRUE;
         flinger.dragShifts = ATTACHED_FLINGER_DRAG_SHIFTS;
+        flinger.active = TRUE;
+        set_sprite_prop(flinger.gameObject.firstSprite, 0);
+    }
+    else if (abs(flinger.gameObject.velx) < FLINGER_INACTIVE_SPEED && abs(flinger.gameObject.vely) < FLINGER_INACTIVE_SPEED)
+    {
+        flinger.active = FALSE;
+        set_sprite_prop(flinger.gameObject.firstSprite, S_PALETTE);
     }
     applyDragToGameObject(&flinger.gameObject, flinger.dragShifts);
     updateGameObject(&flinger.gameObject, &player.gameObject);

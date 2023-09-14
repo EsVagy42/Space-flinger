@@ -21,6 +21,7 @@ typedef struct Flinger
     uint8_t accelerationShifts;
     uint8_t dragShifts;
     BOOLEAN attached;
+    BOOLEAN active;
 };
 
 inline void initPlayer(Player* player)
@@ -58,4 +59,5 @@ inline void initFlinger(Flinger* flinger)
     flinger->gameObject.collider.sizex = FIXED(8);
     flinger->gameObject.collider.sizey = FIXED(8);
     flinger->attached = TRUE;
+    flinger->active = TRUE;
 }
