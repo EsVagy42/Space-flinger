@@ -24,6 +24,7 @@ typedef struct Enemy
     uint8_t deathTimer; //if it is set to something other than 0, the death animation is playing
     enum SpaceshipType type;
     uint8_t points;
+    uint8_t enemyDisplayTile;
     void (*move) (Enemy*, Player*); //this is a pointer to a function that makes the enemy move
     void (*updateSprites) (Enemy*);
 };
