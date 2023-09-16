@@ -59,9 +59,9 @@ void moveFollower(Enemy* follower, Player* player)
     applyDragToGameObject(&follower->gameObject, follower->dragShifts);
 }
 
-void updateFollowerSprites(Enemy* follower)
+void updateSprites(Enemy* enemy)
 {
-    setRotatedSprite(follower->gameObject.firstSprite, 4, follower->gameObject.velx, follower->gameObject.vely);
+    setRotatedSprite(enemy->gameObject.firstSprite, enemy->enemyDisplayTile, enemy->gameObject.velx, enemy->gameObject.vely);
 }
 
 void initFollower(uint8_t index, Player* player)
@@ -84,7 +84,8 @@ void initFollower(uint8_t index, Player* player)
     initEnemy->type = follower;
     initEnemy->deathTimer = 0;
     initEnemy->move = moveFollower;
-    initEnemy->updateSprites = updateFollowerSprites;
+    initEnemy->updateSprites = updateSprites;
+    initEnemy->enemyDisplayTile = 4;
 }
 
 
@@ -114,11 +115,6 @@ void moveSpiralerNegative(Enemy* spiraler, Player* player)
     applyDragToGameObject(&spiraler->gameObject, spiraler->dragShifts);
 }
 
-void updateSpiralerSprites(Enemy* spiraler)
-{
-    setRotatedSprite(spiraler->gameObject.firstSprite, 13, spiraler->gameObject.velx, spiraler->gameObject.vely);
-}
-
 void initSpiralerPositive(uint8_t index, Player* player)
 {
     Enemy* initEnemy = &enemies[index];
@@ -139,7 +135,8 @@ void initSpiralerPositive(uint8_t index, Player* player)
     initEnemy->type = spiraler;
     initEnemy->deathTimer = 0;
     initEnemy->move = moveSpiralerPositive;
-    initEnemy->updateSprites = updateSpiralerSprites;
+    initEnemy->updateSprites = updateSprites;
+    initEnemy->enemyDisplayTile = 13;
 }
 
 void initSpiralerNegative(uint8_t index, Player* player)
@@ -162,7 +159,8 @@ void initSpiralerNegative(uint8_t index, Player* player)
     initEnemy->type = spiraler;
     initEnemy->deathTimer = 0;
     initEnemy->move = moveSpiralerNegative;
-    initEnemy->updateSprites = updateSpiralerSprites;
+    initEnemy->updateSprites = updateSprites;
+    initEnemy->enemyDisplayTile = 13;
 }
 
 

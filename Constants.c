@@ -23,6 +23,10 @@
 #define UNPAUSE_TIMER_START 30
 #define UNPAUSE_COUNTER_SHIFTS 2
 
+#define ENEMY_DISPLAY_STARTING_SPRITE 32
+#define ENEMY_DISPLAY_FIRST_SPRITE_POS_X 49
+#define ENEMY_DISPLAY_SPRITES_POS_Y 152
+
 const uint8_t lookup[7][8] = {
     {0, 0, 0, 0, 1, 0},
     {0, 0, 0, 0, 2, 5},

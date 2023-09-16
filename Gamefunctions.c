@@ -36,7 +36,7 @@ uint8_t waveCountdown[2]; //wave timer
 uint8_t enemyLoadTimer;
 uint8_t currentEnemyInWave = 0;
 
-uint8_t currentWaveBCD[] = {0, 1};
+uint8_t currentWaveBCD[] = {0, 0};
 Wave* currentWave;
 
 uint8_t messageTimer = 0; //gets decreased every frame. one it hits 0, the current message gets cleared from the screen
@@ -54,6 +54,38 @@ inline void increaseCurrentWave()
     currentWave++;
 }
 
+inline void deloadEnemy(Enemy* currentEnemy, uint8_t i)
+{
+    activeEnemies[i] = FALSE;
+    hide_sprite(currentEnemy->gameObject.firstSprite);
+}
+
+inline void loadWaveEnemy(uint8_t index)
+{
+    spaceShipFunctions[currentWave->initFunctions[index]](index, &player);
+}
+
+inline void loadNextEnemy()
+{
+    activeEnemies[currentEnemyInWave] = TRUE;
+}
+
+uint8_t deloadEnemyIndex;
+inline void loadNextWave()
+{
+    increaseCurrentWave();
+    copyBCD(waveCountdown, currentWave->waveCountdown, 2);
+    enemyLoadTimer = currentWave->enemyLoadDelay;
+    currentEnemyInWave = 0;
+    for (deloadEnemyIndex = 0; deloadEnemyIndex < MAX_ENEMY_NUMBER; deloadEnemyIndex++)
+    {
+        deloadEnemy(&enemies[deloadEnemyIndex], deloadEnemyIndex);
+        loadWaveEnemy(deloadEnemyIndex);
+        set_sprite_tile(deloadEnemyIndex + ENEMY_DISPLAY_STARTING_SPRITE, enemies[deloadEnemyIndex].enemyDisplayTile);
+        set_sprite_prop(deloadEnemyIndex + ENEMY_DISPLAY_STARTING_SPRITE, 0);
+    }
+}
+
 void interrupt()
 {
     switch (LYC_REG)
@@ -68,7 +100,10 @@ void interrupt()
             break;
 
         case 135:
-            HIDE_SPRITES;
+            if (messageTimer != 0)
+            {
+                HIDE_SPRITES;
+            }
             SHOW_WIN;
             LYC_REG = 7;
             break;
@@ -104,13 +139,15 @@ void setup()
     }
     set_interrupts(LCD_IFLAG | VBL_IFLAG);
 
-    
+    uint8_t xPos = ENEMY_DISPLAY_FIRST_SPRITE_POS_X;
+    for (uint8_t i = ENEMY_DISPLAY_STARTING_SPRITE; i < ENEMY_DISPLAY_STARTING_SPRITE + MAX_ENEMY_NUMBER; i++)
+    {
+        move_sprite(i, xPos, ENEMY_DISPLAY_SPRITES_POS_Y);
+        xPos += 10;
+    }
 
-    copyBCD(waveCountdown, waves[0].waveCountdown, 2);
-    enemyLoadTimer = waves[0].enemyLoadDelay;
-
-    currentWave = waves;
-    currentEnemyInWave = 0;
+    currentWave = waves - 1;
+    loadNextWave();
 
     //initializing the player
     initPlayer(&player);
@@ -321,29 +358,4 @@ inline void loadEnemy()
         //if an enemy couldn't be loaded, delay the loading
         enemyTimer++;
     }
-}
-
-inline void deloadEnemy(Enemy* currentEnemy, uint8_t i)
-{
-    activeEnemies[i] = FALSE;
-    hide_sprite(currentEnemy->gameObject.firstSprite);
-}
-
-uint8_t deloadEnemyIndex;
-inline void loadNextWave()
-{
-    increaseCurrentWave();
-    copyBCD(waveCountdown, currentWave->waveCountdown, 2);
-    enemyLoadTimer = currentWave->enemyLoadDelay;
-    currentEnemyInWave = 0;
-    for (deloadEnemyIndex = 0; deloadEnemyIndex < MAX_ENEMY_NUMBER; deloadEnemyIndex++)
-    {
-        deloadEnemy(&enemies[deloadEnemyIndex], deloadEnemyIndex);
-    }
-}
-
-inline void loadNextEnemy()
-{
-    spaceShipFunctions[currentWave->initFunctions[currentEnemyInWave]](currentEnemyInWave, &player);
-    activeEnemies[currentEnemyInWave] = TRUE;
 }
