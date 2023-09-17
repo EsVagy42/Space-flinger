@@ -82,7 +82,7 @@ void main()
                         }
                         else
                         {
-                            playEnemyDeathAnimation(currentEnemy);
+                            playEnemyDeathAnimation(currentEnemy, currentEnemyIndex);
                         }
                     }
 

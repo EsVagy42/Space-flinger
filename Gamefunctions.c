@@ -68,6 +68,7 @@ inline void loadWaveEnemy(uint8_t index)
 inline void loadNextEnemy()
 {
     activeEnemies[currentEnemyInWave] = TRUE;
+    set_sprite_prop(currentEnemyInWave + ENEMY_DISPLAY_STARTING_SPRITE, 0);
 }
 
 uint8_t deloadEnemyIndex;
@@ -82,7 +83,7 @@ inline void loadNextWave()
         deloadEnemy(&enemies[deloadEnemyIndex], deloadEnemyIndex);
         loadWaveEnemy(deloadEnemyIndex);
         set_sprite_tile(deloadEnemyIndex + ENEMY_DISPLAY_STARTING_SPRITE, enemies[deloadEnemyIndex].enemyDisplayTile);
-        set_sprite_prop(deloadEnemyIndex + ENEMY_DISPLAY_STARTING_SPRITE, 0);
+        set_sprite_prop(deloadEnemyIndex + ENEMY_DISPLAY_STARTING_SPRITE, S_PALETTE);
     }
 }
 
@@ -103,8 +104,17 @@ void interrupt()
             if (messageTimer != 0)
             {
                 HIDE_SPRITES;
+                LYC_REG = 7;
+            }
+            else
+            {
+                LYC_REG = 0;
             }
             SHOW_WIN;
+            break;
+        
+        case 0:
+            HIDE_SPRITES;
             LYC_REG = 7;
             break;
     }
@@ -294,13 +304,14 @@ inline void updateEnemy(Enemy* currentEnemy)
     currentEnemy->updateSprites(currentEnemy);
 }
 
-inline void playEnemyDeathAnimation(Enemy* currentEnemy)
+inline void playEnemyDeathAnimation(Enemy* currentEnemy, uint8_t enemyIndex)
 {
     if (currentEnemy->deathTimer == POINT_FRAMES) //the score for the enemy should begin showing this frame
     {
         addScore(score, currentEnemy->points);
         showScore(score);
         set_sprite_tile(currentEnemy->gameObject.firstSprite, POINT_OFFSET + currentEnemy->points);
+        set_sprite_tile(enemyIndex + ENEMY_DISPLAY_STARTING_SPRITE, POINT_OFFSET + currentEnemy->points);
     }
     else if (currentEnemy->deathTimer < POINT_FRAMES) //the score for the enemy is being displayed
     {
